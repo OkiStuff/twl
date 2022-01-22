@@ -1,0 +1,5 @@
+++++++ ; Set current element as 6
+#      ; Copy current element's value into the register
+[      ; Next Element
+~      ; Copy Element
+>      ; Print Number

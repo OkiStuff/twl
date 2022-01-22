@@ -17,3 +17,8 @@ class Utils:
 
     def string_to_array(string : str) -> list:
         return [c for c in string]
+
+    def ascii_values_to_string(values : list) -> str:
+        buf : str = ""
+        for i in values: buf += chr(i)
+        return buf

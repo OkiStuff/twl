@@ -14,11 +14,15 @@ class Builder:
         * -     Multiply the current value on the selected element in the Virtual Stack against the value on the next element in the Virtual Stack
         / -     Divide the current value on the selected element in the Virtual Stack against the value on the next element in the Virtual Stack
         > -     Pipe the current value on the selected element in the Virtual Stack to stdout
+        @ -     Pipe the current value on the selected element in the Virtual Stack to stdout (uses a buffer index, goes up for the amount in the previous element)
         < -     Get user input and set it as the current value on the selected element (Numbers only)
         ! -     Clear selected element on Virtual Stack
         ^ -     Set selected element to copy the next element in the Virtual Stack
         { -     Add the next element's value in the Virtual stack to the current element's value in the Virtual Stack
         } -     Subtract the next element's value in the Virtual stack to the current element's value in the Virtual Stack
+        & -     Turn current element's value into string (Numbers being treated as ASCII Values)
+        ~ -     Copy register value into the selected element in the Virtual Stack
+        # -     Set register value as the value in the selected element in the Virtual Stack
 
         { content } -   (NOT IMPLEMENTED) Loop     
         """
@@ -33,6 +37,7 @@ class Builder:
         DIVIDE = 5
 
         PIPE_STDOUT = 6
+        PIPE_STDOUT_LOOP = 13
         PIPE_STDIN = 7
         
         CLEAR_ELEMENT = 8
@@ -40,6 +45,11 @@ class Builder:
 
         SUBTRACT_NEXT_ELEMENT = 10
         ADD_NEXT_ELEMENT = 11
+
+        ASCII_VALUE_TO_STRING = 12
+
+        REGISTER_COPY = 14
+        REGISTER_SET = 15
 
     def __init__(self, contents, extension) -> None:
         self.contents : str = contents
@@ -67,10 +77,18 @@ class Builder:
             # Piping
             elif (char == '>'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.PIPE_STDOUT)
             elif (char == '<'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.PIPE_STDIN)
+            elif (char == '@'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.PIPE_STDOUT_LOOP)
 
             # Element Manipulation
             elif (char == '!'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.CLEAR_ELEMENT)
             elif (char == '^'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.COPY_NEXT_ELEMENT)
+
+            # Strings
+            elif (char == '&'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.ASCII_VALUE_TO_STRING)
+
+            # Registers
+            elif (char == '~'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.REGISTER_COPY)
+            elif (char == '#'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.REGISTER_SET)
 
     def write_to_binary_file(self, filepath) -> None:
         bytecode = bytearray(self.tokens)

@@ -8,6 +8,7 @@ class VM:
         self.pc = 0     # For debugging purposes
         self.vsi = 0    # Index on Virtual Stack
         self.stack = [0]
+        self.register = 0
 
         self.bytecode = bytes
     
@@ -43,6 +44,13 @@ class VM:
                 stdin = input()
                 self.stack[self.vsi] = int(stdin)
 
+            elif (byte == 13):
+                i = 0
+                while (i < self.stack[self.vsi - 1]):
+                    print(self.stack[self.vsi + i], end="")
+                    i += 1
+                    
+
             # Element Manipulation
             elif (byte == 8):
                 self.stack[self.vsi] = 0
@@ -50,3 +58,13 @@ class VM:
             elif (byte == 9):
                 self.stack[self.vsi] = self.stack[self.vsi + 1]
             
+            # String
+            elif (byte == 12):
+                self.stack[self.vsi] = Utils.ascii_values_to_string([self.stack[self.vsi]])
+
+            # Registers
+            elif (byte == 14):
+                self.stack[self.vsi] = self.register
+            
+            elif (byte == 15):
+                self.register = self.stack[self.vsi]
