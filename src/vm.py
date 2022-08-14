@@ -5,18 +5,25 @@ from utils import Utils
 class VM:
 
     def __init__(self, bytes) -> None:
-        self.pc = 0     # For debugging purposes
+        self.pc = -1     # For debugging purposes
         self.vsi = 0    # Index on Virtual Stack
         self.stack = [0]
         self.register = 0
 
         self.bytecode = bytes
+        self.jmp_to = -1
     
     def run(self) -> None:
         bytecode = list(self.bytecode)
 
-        for byte in bytecode:
+        for pc in range(lbytecode):
             self.pc += 1
+            byte = bytecode[pc]
+
+            if (self.jmp_to >= 0):
+                self.jmp_to -= 1
+                print(f"Jump To before: {self.jmp_to + 1}\nJump to now: {self.jmp_to}")
+                continue
 
             # Indexing
             if (byte == 0):
@@ -27,7 +34,7 @@ class VM:
 
             elif (byte == 1):
                 if (self.vsi > 0): self.vsi -= 1
-                else: raise Exception("Attempted to set index on Virtual Stack to a negative value")
+                else: raise Exception(f"Attempted to set index on Virtual Stack to a negative value\nPC Counter: {self.pc}")
 
             # Maths
             elif (byte == 2): self.stack[self.vsi] += 1
@@ -68,3 +75,14 @@ class VM:
             
             elif (byte == 15):
                 self.register = self.stack[self.vsi]
+            
+            # XOR
+            elif (byte == 16):
+                self.stack[self.vsi] = self.stack[self.vsi - 2] ^ self.stack[self.vsi - 1]
+            
+            # JMP
+            elif (byte == 17):
+                self.stack[self.vsi] = (self.stack[self.vsi - 2] == self.stack[self.vsi - 3])
+                
+                if (self.stack[self.vsi] == False):
+                    self.jmp_to = self.stack[self.vsi - 1] -

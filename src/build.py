@@ -3,7 +3,6 @@ import struct
 
 
 class Builder:
-    
     class BUILDER_TOKENS_ENUMS:
 
         """
@@ -23,6 +22,9 @@ class Builder:
         & -     Turn current element's value into string (Numbers being treated as ASCII Values)
         ~ -     Copy register value into the selected element in the Virtual Stack
         # -     Set register value as the value in the selected element in the Virtual Stack
+        , -     XOR the last two elements against each other (stack[index] = stack[index - 2] XOR stack[index - 1]) from the current element on the Virtual Stack and set the current element as the result 
+        = -     Compare the two elements before the element behind the selected element against eachother (stack[index] = stack[index - 2] == stack[index - 3]) and set the current selected element in the Virtual Stack as the result,
+                    if the comparison failed, jump to character index in last element.
 
         { content } -   (NOT IMPLEMENTED) Loop     
         """
@@ -51,14 +53,18 @@ class Builder:
         REGISTER_COPY = 14
         REGISTER_SET = 15
 
+        XOR = 16
+
+        JMP_IF_FAILED = 17
+
+
     def __init__(self, contents, extension) -> None:
-        self.contents : str = contents
+        self.contents: str = contents
         self.tokens = []
         self.extension = extension
 
     def generate_tokens(self) -> None:
         string = Utils.string_to_array(self.contents)
-        x = 0
         for char in string:
             # Indexing
 
@@ -89,6 +95,12 @@ class Builder:
             # Registers
             elif (char == '~'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.REGISTER_COPY)
             elif (char == '#'): self.tokens.append(self.BUILDER_TOKENS_ENUMS.REGISTER_SET)
+
+            # XOR
+            elif (char == ','): self.tokens.append(self.BUILDER_TOKENS_ENUMS.XOR)
+
+            # JMP
+            elif (char == '='): self.tokens.append(self.BUILDER_TOKENS_ENUMS.JMP_IF_FAILED)
 
     def write_to_binary_file(self, filepath) -> None:
         bytecode = bytearray(self.tokens)
